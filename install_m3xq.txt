@@ -47,6 +47,7 @@ sudo mkinitcpio -P
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 # add nvidia nvidia_modeset nvidia_uvm nvidia_drm to MODULES in /etc/mkinitcpio.conf and regenerate the initramfs
+# Create /etc/modprobe.d/nvidia.conf with options nvidia_drm modeset=1 fbdev=1
 sudo mkinitcpio -P
 
 # install dev versions of hyprland and xorg-xwayland

@@ -69,6 +69,8 @@ sudo pacman -Syu pipewire wireplumber pipewire-audio pipewire-alsa pipewire-puls
 sudo pacman -Syu xdg-desktop-portal-hyprland
 sudo pacman -Syu xdg-desktop-portal-gtk
 
+sudo pacman -Syu wl-clipboard
+
 # install Authentication Agent
 sudo pacman -Syu polkit-kde-agent
 

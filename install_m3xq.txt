@@ -1,0 +1,231 @@
+pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware networkmanager intel-ucode lvm2 grub efibootmgr os-prober git wget curl ufw vim reflector openssh
+
+# uncomment in /etc/pacman.conf
+Color
+ParallelDownloads=5
+[multilib]
+
+# Add ILoveCandy
+# Configure mirrors
+sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+sudo reflector --verbose --latest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+
+# Update system
+sudo pacman -Syu
+
+sudo pacman -Syu vulkan-intel
+
+# Enable firewall
+sudo systemctl enable ufw
+
+# Install AUR helper(yay)
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+
+# Update yay
+yay -Syu
+
+# Make yay to update dev packages
+yay -Y --devel --save
+
+# Check GPU
+lspci -k | grep -A 2 -E "(VGA|3D)"
+
+# install right nvidia driver(arch wiki link)
+# install lib32 packages
+sudo pacman -Syu lib32-nvidia-utils
+# remove kms from HOOKS in /etc/mkinitcpio.conf and regenerate the initramfs
+sudo mkinitcpio -P
+
+# reboot
+
+# enable nvidia modeset
+# add nvidia_drm.modeset=1 to the end of GRUB_CMDLINE_LINUX_DEFAULT= in /etc/default/grub and regenerate config
+# add nvidia.NVreg_PreserveVideoMemoryAllocations=1 to the end of GRUB_CMDLINE_LINUX_DEFAULT=
+# set GRUB_TIMEOUT_STYLE=hidden
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+# add nvidia nvidia_modeset nvidia_uvm nvidia_drm to MODULES in /etc/mkinitcpio.conf and regenerate the initramfs
+sudo mkinitcpio -P
+
+# install dev versions of hyprland and xorg-xwayland
+yay -Syu hyprland-git
+yay -Syu xorg-xwayland-git
+
+# install nvidia-vaapi-driver
+sudo pacman -Syu libva-nvidia-driver
+
+# enable nvidia-suspend.service, nvidia-hibernate.service nvidia-resume.service
+sudo systemctl enable nvidia-suspend.service
+sudo systemctl enable nvidia-hibernate.service
+sudo systemctl enable nvidia-resume.service
+
+# install pipewire for audio
+sudo pacman -Syu pipewire wireplumber pipewire-audio pipewire-alsa pipewire-pulse pipewire-jack pavucontrol
+
+# install XDG Desktop portal
+sudo pacman -Syu xdg-desktop-portal-hyprland
+sudo pacman -Syu xdg-desktop-portal-gtk
+
+# install Authentication Agent
+sudo pacman -Syu polkit-kde-agent
+
+# QT Wayland support
+sudo pacman -Syu qt5-wayland qt6-wayland
+
+# install terminal emulator
+sudo pacman -Syu kitty
+
+# install wallpaper utility
+sudo pacman -Syu hyprpaper
+
+# install better ls command
+sudo pacman -Syu lsd
+
+# install better cat command
+sudo pacman -Syu bat
+
+# install audio visuablizer
+yay -Syu cava
+
+# install zsh shell
+sudo pacman -Syu zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# install fira code nerd font
+sudo pacman -Syu ttf-firacode-nerd
+
+# install bibata cursors
+yay -Syu bibata-cursor-theme
+
+# install papirus icon theme
+sudo pacman -Syu papirus-icon-theme
+
+# install GTK theme
+yay -Syu everforest-gtk-theme-git
+
+# install GTK settings editor
+sudo pacman -Syu nwg-look
+
+# install qt configuration tools
+sudo pacman -Syu qt5ct qt6ct
+
+# install firefox
+sudo pacman -Syu firefox-developer-edition
+
+# install telegram-desktop
+sudo pacman -Syu telegram-desktop
+
+# install spotify and uncomment # On wayland you might need in /etc/spotify-launcher.conf
+sudo pacman -Syu spotify-launcher unzip
+
+# install spicetify
+curl -fsSL https://raw.githubusercontent.com/spicetify/spicetify-cli/master/install.sh | sh
+# relogin
+# edit ~/.config/spicetify/config-xpui.ini
+# spotify_path= $HOME/.local/share/spotify-launcher/install/usr/share/spotify/
+# install comfy
+curl -fsSL https://raw.githubusercontent.com/NYRI4/Comfy-spicetify/main/install.sh | sh
+
+
+# allow access to SMBus
+sudo pacman -Syu i2c-tools
+sudo modprobe i2c-dev
+sudo usermod $USER -aG i2c
+sudo touch /etc/modules-load.d/i2c.conf && sudo sh -c 'echo "i2c-dev" >> /etc/modules-load.d/i2c.conf'
+# intel only
+sudo modprobe i2c-i801
+# add acpi_enforce_resources=lax to GRUB_CMDLINE_LINUX_DEFAULT= in /etc/default/grub and regenerate config
+
+# install discord
+yay -Syu vesktop
+
+# copy cfgs from git(link)
+
+# install openrgb
+sudo pacman -Syu openrgb
+# create profile and edit systemd service in /etc/systemd/system/multi-user.target.wants
+# enable service
+sudo systemctl enable openrgb.service
+
+# gaming stuff
+
+# control kraken
+sudo pacman -Syu liquidctl
+# create /etc/systemd/system/liquidcfg.service:
+[Unit]
+Description=AIO startup service
+
+[Service]
+Type=oneshot
+ExecStart=liquidctl initialize all
+ExecStart=liquidctl --match kraken set pump speed 90
+ExecStart=liquidctl --match kraken set fan speed  20 30  30 50  34 80  40 90  50 100
+
+[Install]
+WantedBy=default.target
+
+# enable service
+sudo systemctl daemon-reload
+sudo systemctl enable liquidcfg.service
+
+# install fonts for steam
+sudo pacman -Syu ttf-liberation
+
+# CJK support
+sudo pacman -Syu wqy-zenhei
+
+# install lib32-systemd
+sudo pacman -Syu lib32-systemd
+
+# install nvidia-settings
+sudo pacman -Syu nvidia-settings
+
+# install vulkan-tools
+sudo pacman -Syu vulkan-tools
+
+# install mesa-utils
+sudo pacman -Syu mesa-utils
+
+# install steam
+sudo pacman -Syu steam
+
+# install steam skins
+git clone https://github.com/tkashkin/Adwaita-for-Steam
+cd Adwaita-for-Steam
+./install.py
+
+# Increase vm.max_map_count
+# Add vm.max_map_count = 2147483642 to /etc/sysctl.d/80-gamecompatibility.conf
+
+# Join the audio group
+sudo usermod $USER -aG audio
+
+# install libva-utils
+sudo pacman -Syu libva-utils
+
+# install mangohud
+sudo pacman -Syu mangohud lib32-mangohud goverlay
+
+# run goverlay and configure mangohud
+
+# install gamemode
+sudo pacman -Syu gamemode lib32-gamemode
+
+# enable coolbits(run twice)
+sudo nvidia-xconfig --cool-bits=28
+sudo nvidia-xconfig --cool-bits=28
+
+# install xorg-host
+sudo pacman -Syu xorg-xhost 
+
+# copy gamemode cfg
+
+# add to launch options in steam 
+# mangohud gamemoderun %command%
+
+# run game_start.sh after boot
+# control fans with scripts(fans_30.sh and fans_80.sh) for now
+
+# reboot

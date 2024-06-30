@@ -1,0 +1,10 @@
+sudo pacman -Syu pipes.sh
+yay -Syu cava
+sudo pacman -Syu rofi
+
+# run this after theme install
+bat cache --build
+
+
+# TODO
+migrate to rofi-wayland from wofi

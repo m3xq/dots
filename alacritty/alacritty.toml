@@ -1,0 +1,22 @@
+import = [
+    "~/.config/alacritty/themes/themes/everforest_dark.toml"
+]
+
+live_config_reload = true
+
+[window]
+padding = { x = 4, y = 4 }
+dynamic_padding = true
+decorations = "None"
+resize_increments = true
+
+[font]
+normal = { family = "FiraCode Nerd Font", style = "Regular" }
+size = 14
+
+[cursor]
+style = { blinking = "On" }
+
+[mouse]
+hide_when_typing = true
+

@@ -1,0 +1,11 @@
+sudo pacman -Syu pipes.sh
+yay -Syu cava
+sudo pacman -Syu rofi
+
+# run this after theme install
+bat cache --build
+
+n0x4l1n3@fluxxwave
+
+# TODO
+migrate to rofi-wayland from wofi
